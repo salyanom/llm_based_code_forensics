@@ -1,0 +1,42 @@
+[
+  {
+    "source": "Juliet",
+    "type": "code",
+    "embedding_text": "CWE-78 Juliet pattern: user input from fgets is concatenated into a shell command and executed with system().",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "metadata": {"suite": "Juliet", "variant": "command_injection"}
+  },
+  {
+    "source": "Juliet",
+    "type": "code",
+    "embedding_text": "CWE-120 Juliet pattern: strcpy copies untrusted input into fixed-size destination without bounds checks.",
+    "cwe": "CWE-120",
+    "cve": "Unknown",
+    "metadata": {"suite": "Juliet", "variant": "buffer_overflow"}
+  },
+  {
+    "source": "Juliet",
+    "type": "code",
+    "embedding_text": "CWE-134 Juliet pattern: printf called with attacker-controlled format string variable.",
+    "cwe": "CWE-134",
+    "cve": "Unknown",
+    "metadata": {"suite": "Juliet", "variant": "format_string"}
+  },
+  {
+    "source": "Juliet",
+    "type": "code",
+    "embedding_text": "CWE-190 Juliet pattern: integer multiplication overflow when allocating memory for array elements.",
+    "cwe": "CWE-190",
+    "cve": "Unknown",
+    "metadata": {"suite": "Juliet", "variant": "integer_overflow"}
+  },
+  {
+    "source": "Juliet",
+    "type": "code",
+    "embedding_text": "CWE-416 Juliet pattern: pointer freed and then dereferenced in a later branch (use-after-free).",
+    "cwe": "CWE-416",
+    "cve": "Unknown",
+    "metadata": {"suite": "Juliet", "variant": "use_after_free"}
+  }
+]

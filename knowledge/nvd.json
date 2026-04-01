@@ -1,0 +1,42 @@
+[
+  {
+    "source": "NVD",
+    "type": "cve_description",
+    "embedding_text": "CVE-2021-3156: Heap-based buffer overflow in sudo due to improper bounds checking in command line parsing.",
+    "cwe": "CWE-122",
+    "cve": "CVE-2021-3156",
+    "metadata": {"product": "sudo", "impact": "privilege_escalation"}
+  },
+  {
+    "source": "NVD",
+    "type": "cve_description",
+    "embedding_text": "CVE-2014-6271: Bash command injection via crafted environment variables parsed by shell startup logic.",
+    "cwe": "CWE-78",
+    "cve": "CVE-2014-6271",
+    "metadata": {"product": "bash", "impact": "remote_code_execution"}
+  },
+  {
+    "source": "NVD",
+    "type": "cve_description",
+    "embedding_text": "CVE-2017-5638: Command injection in Apache Struts from attacker-controlled Content-Type header evaluation.",
+    "cwe": "CWE-78",
+    "cve": "CVE-2017-5638",
+    "metadata": {"product": "struts", "impact": "remote_code_execution"}
+  },
+  {
+    "source": "NVD",
+    "type": "cve_description",
+    "embedding_text": "CVE-2015-0235: Out-of-bounds read in glibc gethostbyname implementation leading to information disclosure.",
+    "cwe": "CWE-125",
+    "cve": "CVE-2015-0235",
+    "metadata": {"product": "glibc", "impact": "information_disclosure"}
+  },
+  {
+    "source": "NVD",
+    "type": "cve_description",
+    "embedding_text": "CVE-2014-0160: OpenSSL Heartbleed out-of-bounds read due to missing payload length validation.",
+    "cwe": "CWE-125",
+    "cve": "CVE-2014-0160",
+    "metadata": {"product": "openssl", "impact": "memory_disclosure"}
+  }
+]

@@ -1,0 +1,65 @@
+{
+  "c": {
+    "sources": [
+      "gets",
+      "scanf",
+      "fgets",
+      "fgetc",
+      "fread",
+      "recv",
+      "read",
+      "getenv"
+    ],
+    "sinks": [
+      "system",
+      "exec",
+      "execl",
+      "execv",
+      "popen",
+      "strcpy",
+      "sprintf",
+      "printf",
+      "fprintf"
+    ],
+    "propagators": [
+      "strcpy",
+      "strcat",
+      "memcpy",
+      "strncpy",
+      "memmove"
+    ],
+    "sanitizers": [
+      "strncpy",
+      "snprintf",
+      "fgets"
+    ]
+  },
+  "python": {
+    "sources": [
+      "input",
+      "read",
+      "recv",
+      "getenv",
+      "open"
+    ],
+    "sinks": [
+      "eval",
+      "exec",
+      "os.system",
+      "subprocess.run",
+      "subprocess.call",
+      "subprocess.Popen"
+    ],
+    "propagators": [
+      "format",
+      "join",
+      "replace"
+    ],
+    "sanitizers": [
+      "shlex.quote",
+      "html.escape",
+      "bleach.clean"
+    ]
+  }
+}
+

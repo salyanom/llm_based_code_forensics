@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code Forensics Control Center</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: rgba(18, 26, 53, 0.78);
+      --panel-solid: #151f3f;
+      --text: #e7ecff;
+      --muted: #9aa7d1;
+      --line: rgba(140, 163, 255, 0.24);
+      --brand: #6a8bff;
+      --brand-2: #3fd5ff;
+      --ok: #2fd27b;
+      --warn: #ffcf5a;
+      --high: #ff8a65;
+      --critical: #ff5c7c;
+      --chip: rgba(255, 255, 255, 0.08);
+      --shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
+      --radius: 16px;
+      --radius-sm: 12px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 900px at -10% -20%, #273f91 0%, transparent 45%),
+        radial-gradient(1000px 850px at 120% -10%, #144a86 0%, transparent 40%),
+        linear-gradient(160deg, #090d1c 0%, #0d1430 60%, #0a1127 100%);
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(106, 139, 255, 0.18), rgba(63, 213, 255, 0.1));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      padding: 20px 22px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 750;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h3 {
+      margin: 4px 0 10px;
+      font-size: 15px;
+      color: #cdd8ff;
+      letter-spacing: 0.3px;
+      font-weight: 650;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .field { margin-bottom: 10px; }
+
+    input, textarea, select, button {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(137, 162, 255, 0.28);
+      background: rgba(9, 16, 37, 0.72);
+      color: var(--text);
+      outline: none;
+      padding: 10px 11px;
+      transition: 0.2s ease;
+      font-size: 14px;
+    }
+
+    textarea { min-height: 84px; resize: vertical; }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--brand-2);
+      box-shadow: 0 0 0 3px rgba(63, 213, 255, 0.18);
+    }
+
+    button {
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      border: none;
+      color: white;
+      font-weight: 650;
+      letter-spacing: 0.2px;
+    }
+
+    button:hover { transform: translateY(-1px); filter: brightness(1.06); }
+    button.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--warn);
+      box-shadow: 0 0 14px var(--warn);
+    }
+    .dot.ok { background: var(--ok); box-shadow: 0 0 14px var(--ok); }
+    .dot.bad { background: var(--critical); box-shadow: 0 0 14px var(--critical); }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 11px;
+    }
+
+    .card .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .card .v { font-size: 22px; font-weight: 750; margin-top: 5px; }
+
+    .vuln-list {
+      display: grid;
+      gap: 10px;
+      max-height: calc(100vh - 290px);
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .vuln {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-solid);
+      padding: 12px;
+    }
+
+    .vuln-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .vuln-title { font-weight: 680; font-size: 15px; }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .chip {
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      font-size: 11px;
+      padding: 4px 8px;
+      color: #d9e2ff;
+      background: var(--chip);
+    }
+
+    .sev-Critical { border-color: rgba(255,92,124,0.5); color: #ffd6de; background: rgba(255, 92, 124, 0.2); }
+    .sev-High { border-color: rgba(255,138,101,0.5); color: #ffe2d7; background: rgba(255, 138, 101, 0.2); }
+    .sev-Medium { border-color: rgba(255,207,90,0.5); color: #fff3ce; background: rgba(255, 207, 90, 0.2); }
+    .sev-Low { border-color: rgba(47,210,123,0.5); color: #d8ffe7; background: rgba(47, 210, 123, 0.2); }
+    .sev-Info { border-color: rgba(144, 164, 255, 0.5); color: #dfe6ff; background: rgba(144, 164, 255, 0.2); }
+
+    .muted { color: var(--muted); font-size: 13px; }
+
+    pre {
+      margin: 6px 0 0;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #0a122a;
+      color: #d8e4ff;
+      font-size: 12px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      max-height: 220px;
+      overflow: auto;
+    }
+
+    .history-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+    }
+    .history-item:hover { border-color: rgba(102, 184, 255, 0.55); }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 14px;
+    }
+
+    .empty {
+      border: 1px dashed rgba(255,255,255,0.26);
+      border-radius: 12px;
+      color: var(--muted);
+      text-align: center;
+      padding: 24px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 1120px) {
+      .grid { grid-template-columns: 1fr; }
+      .split { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+      .vuln-list { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <div>
+        <div class="title">Code Forensics Control Center</div>
+        <div class="subtitle">AI-assisted vulnerability scanning, CVSS scoring, patch generation, and analyst feedback loop.</div>
+      </div>
+      <div class="status"><span id="healthDot" class="dot"></span><span id="healthText">API not checked</span></div>
+    </section>
+
+    <section class="grid">
+      <aside class="panel">
+        <h3>Connection</h3>
+        <div class="field">
+          <label>API Base URL</label>
+          <input id="apiBase" value="http://127.0.0.1:8000" />
+        </div>
+        <div class="row">
+          <button onclick="checkHealth()">Check API</button>
+          <button class="secondary" onclick="loadHistory()">Load History</button>
+        </div>
+
+        <h3 style="margin-top:16px;">Scan Configuration</h3>
+        <div class="field">
+          <label>Query</label>
+          <input id="query" value="scan all" placeholder="scan all or semantic query" />
+        </div>
+        <div class="field">
+          <label>Mode</label>
+          <select id="mode" onchange="toggleMode()">
+            <option value="upload">Upload single file</option>
+            <option value="folder">Scan folder path</option>
+          </select>
+        </div>
+
+        <div id="uploadBlock" class="field">
+          <label>Source File (.c/.py)</label>
+          <input id="fileInput" type="file" />
+        </div>
+
+        <div id="folderBlock" class="field" style="display:none;">
+          <label>Folder Path (backend machine)</label>
+          <input id="folderPath" value="code_samples" />
+        </div>
+
+        <div class="field">
+          <label>Patch Generation</label>
+          <select id="patchToggle">
+            <option value="true">Enabled</option>
+            <option value="false">Disabled</option>
+          </select>
+        </div>
+
+        <button onclick="runScan()">Run Scan</button>
+      </aside>
+
+      <main class="panel">
+        <div class="cards">
+          <div class="card"><div class="k">Scan ID</div><div class="v" id="scanId">-</div></div>
+          <div class="card"><div class="k">Findings</div><div class="v" id="totalFindings">0</div></div>
+          <div class="card"><div class="k">Critical</div><div class="v" id="criticalCount">0</div></div>
+          <div class="card"><div class="k">High</div><div class="v" id="highCount">0</div></div>
+          <div class="card"><div class="k">Medium+</div><div class="v" id="mediumPlusCount">0</div></div>
+        </div>
+
+        <div class="split">
+          <section>
+            <h3>Vulnerability Explorer</h3>
+            <div id="vulnRoot" class="vuln-list">
+              <div class="empty">Run a scan to see detailed findings, CVE/CWE mapping, CVSS vectors, patch output, and feedback actions.</div>
+            </div>
+          </section>
+
+          <section>
+            <h3>Recent Scans</h3>
+            <div id="historyRoot"></div>
+          </section>
+        </div>
+      </main>
+    </section>
+  </div>
+
+  <script>
+    let currentScanId = null;
+
+    function esc(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char]));
+    }
+
+    function getApiBase() {
+      return document.getElementById('apiBase').value.trim().replace(/\/$/, '');
+    }
+
+    function toggleMode() {
+      const mode = document.getElementById('mode').value;
+      document.getElementById('uploadBlock').style.display = mode === 'upload' ? 'block' : 'none';
+      document.getElementById('folderBlock').style.display = mode === 'folder' ? 'block' : 'none';
+    }
+
+    async function checkHealth() {
+      const dot = document.getElementById('healthDot');
+      const text = document.getElementById('healthText');
+      text.textContent = 'Checking...';
+      dot.className = 'dot';
+
+      try {
+        const res = await fetch(`${getApiBase()}/health`);
+        if (!res.ok) throw new Error('Unhealthy');
+        text.textContent = 'API online';
+        dot.className = 'dot ok';
+      } catch (_) {
+        text.textContent = 'API unreachable';
+        dot.className = 'dot bad';
+      }
+    }
+
+    function setSummary(report) {
+      const vulns = report.vulnerabilities || [];
+      const sev = { Critical: 0, High: 0, Medium: 0, Low: 0, Info: 0 };
+      for (const item of vulns) {
+        const key = String(item.severity || 'Info');
+        if (sev[key] === undefined) sev[key] = 0;
+        sev[key] += 1;
+      }
+
+      currentScanId = report.scan_id || null;
+      document.getElementById('scanId').textContent = currentScanId ? currentScanId.slice(0, 8) : '-';
+      document.getElementById('totalFindings').textContent = String(vulns.length);
+      document.getElementById('criticalCount').textContent = String(sev.Critical || 0);
+      document.getElementById('highCount').textContent = String(sev.High || 0);
+      document.getElementById('mediumPlusCount').textContent = String((sev.Critical || 0) + (sev.High || 0) + (sev.Medium || 0));
+    }
+
+    function vulnCard(item, idx) {
+      const severityClass = `sev-${esc(item.severity || 'Info')}`;
+      const verification = item.patch_verification ? esc(JSON.stringify(item.patch_verification)) : 'Not available';
+      return `
+        <article class="vuln">
+          <div class="vuln-head">
+            <div class="vuln-title">${esc(item.type || 'Unknown Vulnerability')}</div>
+            <div class="chips"><span class="chip ${severityClass}">${esc(item.severity || 'Info')}</span></div>
+          </div>
+
+          <div class="chips" style="margin-bottom:8px;">
+            <span class="chip">File: ${esc(item.file || '-')}</span>
+            <span class="chip">Function: ${esc(item.function_name || '-')}</span>
+            <span class="chip">Line: ${esc(item.line || '-')}</span>
+            <span class="chip">CWE: ${esc(item.cwe || 'Unknown')}</span>
+            <span class="chip">CVE: ${esc(item.cve || 'Unknown')}</span>
+            <span class="chip">CVSS: ${esc(item.cvss_score || '-')}</span>
+          </div>
+
+          <div class="muted">CVSS Vector: ${esc(item.cvss_vector || 'N/A')}</div>
+          <div class="muted">Threat Intel Match: ${item.threat_intel_match ? 'Yes' : 'No'}</div>
+
+          <pre>${esc(item.explanation || '')}</pre>
+          <pre>${esc(item.patch || 'Patch generation disabled or unavailable.')}</pre>
+          <div class="muted">Patch verification: ${verification}</div>
+
+          <div class="row" style="margin-top:8px;">
+            <select id="fp-${idx}" style="max-width:170px;">
+              <option value="false">Valid finding</option>
+              <option value="true">False positive</option>
+            </select>
+            <input id="comment-${idx}" placeholder="feedback comment" />
+            <button style="max-width:170px;" onclick="submitFeedback(${idx})">Submit Feedback</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderVulnerabilities(report) {
+      const root = document.getElementById('vulnRoot');
+      const items = report.vulnerabilities || [];
+      if (!items.length) {
+        root.innerHTML = '<div class="empty">No vulnerabilities detected for this scan.</div>';
+        return;
+      }
+      root.innerHTML = items.map((item, idx) => vulnCard(item, idx)).join('');
+    }
+
+    async function runScan() {
+      const mode = document.getElementById('mode').value;
+      const query = document.getElementById('query').value || 'scan all';
+      const patchEnabled = document.getElementById('patchToggle').value === 'true';
+      const apiBase = getApiBase();
+
+      document.getElementById('vulnRoot').innerHTML = '<div class="empty">Running scan...</div>';
+
+      try {
+        let response;
+
+        if (mode === 'upload') {
+          const file = document.getElementById('fileInput').files[0];
+          if (!file) {
+            document.getElementById('vulnRoot').innerHTML = '<div class="empty">Please choose a file to upload.</div>';
+            return;
+          }
+          const form = new FormData();
+          form.append('file', file);
+          response = await fetch(`${apiBase}/scan/upload?query=${encodeURIComponent(query)}&generate_patches=${patchEnabled}`, {
+            method: 'POST',
+            body: form,
+          });
+        } else {
+          const folder = document.getElementById('folderPath').value || 'code_samples';
+          response = await fetch(`${apiBase}/scan`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ folder, query, generate_patches: patchEnabled }),
+          });
+        }
+
+        const report = await response.json();
+        if (!response.ok) {
+          document.getElementById('vulnRoot').innerHTML = `<div class="empty">Scan failed: ${esc(report.detail || 'Unknown error')}</div>`;
+          return;
+        }
+
+        setSummary(report);
+        renderVulnerabilities(report);
+        loadHistory();
+      } catch (error) {
+        document.getElementById('vulnRoot').innerHTML = `<div class="empty">Error: ${esc(error.message || error)}</div>`;
+      }
+    }
+
+    async function loadHistory() {
+      const root = document.getElementById('historyRoot');
+      root.innerHTML = '<div class="muted">Loading...</div>';
+      try {
+        const res = await fetch(`${getApiBase()}/scans`);
+        const scans = await res.json();
+        if (!res.ok) throw new Error(scans.detail || 'Failed loading history');
+
+        if (!Array.isArray(scans) || !scans.length) {
+          root.innerHTML = '<div class="empty">No previous scans yet.</div>';
+          return;
+        }
+
+        root.innerHTML = scans.map(item => `
+          <div class="history-item" onclick="openScan('${esc(item.scan_id)}')">
+            <div><strong>${esc(item.scan_id.slice(0, 8))}</strong></div>
+            <div class="muted">${esc(item.created_at)}</div>
+            <div class="muted">Query: ${esc(item.query || '-')}</div>
+            <div class="muted">Files: ${esc(item.file_count || 0)}</div>
+          </div>
+        `).join('');
+      } catch (error) {
+        root.innerHTML = `<div class="empty">${esc(error.message || error)}</div>`;
+      }
+    }
+
+    async function openScan(scanId) {
+      try {
+        const res = await fetch(`${getApiBase()}/scan/${scanId}`);
+        const report = await res.json();
+        if (!res.ok) throw new Error(report.detail || 'Failed to load scan');
+        setSummary(report);
+        renderVulnerabilities(report);
+      } catch (error) {
+        document.getElementById('vulnRoot').innerHTML = `<div class="empty">${esc(error.message || error)}</div>`;
+      }
+    }
+
+    async function submitFeedback(index) {
+      if (!currentScanId) {
+        alert('No active scan selected.');
+        return;
+      }
+      const isFalsePositive = document.getElementById(`fp-${index}`).value === 'true';
+      const comment = document.getElementById(`comment-${index}`).value || '';
+
+      try {
+        const res = await fetch(`${getApiBase()}/feedback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            scan_id: currentScanId,
+            vulnerability_id: null,
+            is_false_positive: isFalsePositive,
+            comment,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Feedback failed');
+        alert('Feedback saved.');
+      } catch (error) {
+        alert(`Feedback error: ${error.message || error}`);
+      }
+    }
+
+    checkHealth();
+    loadHistory();
+  </script>
+</body>
+</html>

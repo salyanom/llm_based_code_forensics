@@ -1,0 +1,42 @@
+[
+  {
+    "source": "OWASP",
+    "type": "pattern",
+    "embedding_text": "OWASP A03 Injection: never pass unsanitized user input into command execution APIs like system(), exec(), popen().",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "metadata": {"category": "A03:2021"}
+  },
+  {
+    "source": "OWASP",
+    "type": "pattern",
+    "embedding_text": "OWASP secure coding: replace gets/strcpy/sprintf with fgets/strncpy/snprintf and enforce destination buffer bounds.",
+    "cwe": "CWE-120",
+    "cve": "Unknown",
+    "metadata": {"category": "memory_safety"}
+  },
+  {
+    "source": "OWASP",
+    "type": "pattern",
+    "embedding_text": "OWASP guidance: prevent format string vulnerabilities by using static format strings and parameterized output formatting.",
+    "cwe": "CWE-134",
+    "cve": "Unknown",
+    "metadata": {"category": "output_handling"}
+  },
+  {
+    "source": "OWASP",
+    "type": "pattern",
+    "embedding_text": "OWASP recommendation: validate arithmetic bounds before multiplication/addition used in allocation sizes to avoid integer overflow.",
+    "cwe": "CWE-190",
+    "cve": "Unknown",
+    "metadata": {"category": "integer_safety"}
+  },
+  {
+    "source": "OWASP",
+    "type": "pattern",
+    "embedding_text": "OWASP memory safety: set pointers to NULL after free and never dereference freed pointers to avoid use-after-free.",
+    "cwe": "CWE-416",
+    "cve": "Unknown",
+    "metadata": {"category": "lifecycle_safety"}
+  }
+]
