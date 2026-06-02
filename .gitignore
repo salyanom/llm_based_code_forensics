@@ -22,8 +22,15 @@ ENV/
 
 # Runtime and generated data
 scan_sessions.db
+scan_sessions.db-*
 *.sqlite3
 qdrant_storage/
+knowledge/nvd_live.json
+
+# Local extracted / scratch files
+PROJECT_RESUME.md
+pdf_extract.txt
+Page 1-2.pdf
 
 # Logs
 *.log
