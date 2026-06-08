@@ -50,3 +50,15 @@ tree-sitter-c/**/*.o
 tree-sitter-c/**/*.dll
 tree-sitter-c/**/*.so
 tree-sitter-c/**/*.dylib
+
+
+# Fine-tuning outputs
+outputs/
+
+# Generated datasets
+data/rag_export_labeled.jsonl
+data/token_counts.json
+data/dataset_candidates.jsonl
+
+# Local activation environment
+Activate.ps1/
