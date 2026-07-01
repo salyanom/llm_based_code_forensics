@@ -28,7 +28,6 @@ os.makedirs(OUT_DIR, exist_ok=True)
 def make_code_example(path):
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         code = f.read().strip()
-
     prompt = f"""Analyze the following source code for security vulnerabilities and return a JSON object with keys:
 - vulnerabilities: list of {{location, type, description}}
 - suggested_patch: short patch or remediation steps
@@ -52,7 +51,6 @@ Please respond only with the JSON object.
         "meta": {"source": path}
     }
 
-
 def make_juliet_examples(juliet_path):
     examples = []
 
@@ -68,7 +66,6 @@ def make_juliet_examples(juliet_path):
         title = item.get("title") or item.get("id") or "juliet_case"
         desc = item.get("description") or item.get("summary") or ""
         code = item.get("code") or item.get("source") or item.get("snippet") or ""
-
         prompt = f"""The Juliet test case '{title}' describes a vulnerability.
 
 Description:

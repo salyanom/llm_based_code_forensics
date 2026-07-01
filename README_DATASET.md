@@ -20,10 +20,13 @@ Practical process
 1) Automated candidate assembly
    - Run `python scripts/prepare_dataset.py` to produce `data/dataset_candidates.jsonl`.
    - This file contains templated prompts and placeholder completions; these MUST be reviewed and labeled by a human.
-2) Human labeling / validation
+2) Merge and normalize everything into one file
+   - Run `python scripts/merge_datasets.py` to combine `data/dataset_candidates.jsonl`, `data/rag_export.jsonl`, and `data/rag_export_labeled.jsonl` into `data/merged_dataset.jsonl`.
+   - The script normalizes line endings and whitespace, deduplicates by prompt, and preserves source provenance in `meta.source_files`.
+3) Human labeling / validation
    - Open `data/dataset_candidates.jsonl`, fill `completion` with the correct JSON/natural-language answer for each prompt.
    - Ensure labels are concise, consistent, and include CWE tags when applicable.
-3) Token counting and sizing
+4) Token counting and sizing
    - Install `transformers` in your venv and run:
 
 ```powershell
@@ -43,6 +46,7 @@ Fine-tune method recommendation
   - micro_batch_size: 4
   - seq_length: 512–1024 (truncate long code or split into functions)
   - learning_rate: 1e-4 – 3e-4
+- To train from the merged file, run `python scripts/train_lora.py --input data/merged_dataset.jsonl`.
 
 Next steps (concrete)
 - Run `python scripts/prepare_dataset.py`.

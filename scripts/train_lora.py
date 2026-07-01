@@ -1,3 +1,5 @@
+import argparse
+
 from datasets import load_dataset
 from transformers import (
     AutoTokenizer,
@@ -9,12 +11,21 @@ from peft import LoraConfig, get_peft_model
 import torch
 
 MODEL_ID = "deepseek-ai/deepseek-coder-6.7b-instruct"
+DEFAULT_INPUT = "data/merged_dataset.jsonl"
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--input", default=DEFAULT_INPUT, help="Merged JSONL dataset to train on")
+parser.add_argument("--output", default="outputs/lora_final", help="Directory for the trained adapter")
+args = parser.parse_args()
 
 dataset = load_dataset(
     "json",
-    data_files="data/rag_export_labeled.jsonl",
+    data_files=args.input,
     split="train",
 )
+
+dataset = dataset.filter(lambda example: bool(str(example.get("completion", "")).strip()))
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
 
@@ -52,7 +63,7 @@ lora_config = LoraConfig(
 model = get_peft_model(model, lora_config)
 
 training_args = TrainingArguments(
-    output_dir="outputs/lora_final",
+    output_dir=args.output,
     num_train_epochs=3,
     per_device_train_batch_size=1,
     gradient_accumulation_steps=4,
@@ -71,7 +82,7 @@ trainer = Trainer(
 
 trainer.train()
 
-model.save_pretrained("outputs/lora_final")
-tokenizer.save_pretrained("outputs/lora_final")
+model.save_pretrained(args.output)
+tokenizer.save_pretrained(args.output)
 
 print("TRAINING_COMPLETE")
