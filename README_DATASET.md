@@ -23,7 +23,8 @@ Practical process
 2) Merge and normalize everything into one file
    - Run `python scripts/merge_datasets.py` to combine `data/dataset_candidates.jsonl`, `data/rag_export.jsonl`, and `data/rag_export_labeled.jsonl` into `data/merged_dataset.jsonl`.
    - The script normalizes line endings and whitespace, deduplicates by prompt, and preserves source provenance in `meta.source_files`.
-   - To include PrimeVul from Hugging Face in the export step, run `python scripts/export_rag_dataset.py --primevul` before merging.
+   - PrimeVul from Hugging Face is included by default in `python scripts/export_rag_dataset.py`.
+   - To skip PrimeVul and export only local knowledge files, run `python scripts/export_rag_dataset.py --no-primevul`.
 3) Human labeling / validation
    - Open `data/dataset_candidates.jsonl`, fill `completion` with the correct JSON/natural-language answer for each prompt.
    - Ensure labels are concise, consistent, and include CWE tags when applicable.

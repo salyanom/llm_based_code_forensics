@@ -5,7 +5,7 @@ Writes `data/rag_export.jsonl` with objects:
 
 Usage:
     python scripts/export_rag_dataset.py
-    python scripts/export_rag_dataset.py --primevul
+    python scripts/export_rag_dataset.py --no-primevul
 
 You can set environment variables to control behavior:
   RAG_EMBED_MODEL - sentence-transformers model id (default: all-MiniLM-L6-v2)
@@ -30,9 +30,9 @@ OUT_PATH = os.path.join(OUT_DIR, "rag_export.jsonl")
 def parse_args():
     parser = argparse.ArgumentParser(description="Export normalized dataset rows to JSONL.")
     parser.add_argument(
-        "--primevul",
+        "--no-primevul",
         action="store_true",
-        help="Also export PrimeVul from Hugging Face using services.rag_engine.",
+        help="Skip PrimeVul from Hugging Face and export only local knowledge files.",
     )
     return parser.parse_args()
 
@@ -139,8 +139,10 @@ def load_local_knowledge():
 args = parse_args()
 
 entries = load_local_knowledge()
-if args.primevul or os.getenv("RAG_EXPORT_PRIMEVUL", "0") == "1":
-    # Attempt heavy export using RAGEngine (may download). Use only when explicitly requested.
+include_primevul = not args.no_primevul and os.getenv("RAG_EXPORT_PRIMEVUL", "1") != "0"
+
+if include_primevul:
+    # Attempt heavy export using RAGEngine (may download). PrimeVul is included by default.
     try:
         from services.rag_engine import RAGEngine
         from sentence_transformers import SentenceTransformer
@@ -150,7 +152,7 @@ if args.primevul or os.getenv("RAG_EXPORT_PRIMEVUL", "0") == "1":
     except Exception as exc:
         print(f"[export] PrimeVul export failed or skipped: {exc}")
 
-print(f"Exporting {len(entries)} local RAG entries to {OUT_PATH}")
+print(f"Exporting {len(entries)} RAG entries to {OUT_PATH}")
 count = 0
 with open(OUT_PATH, "w", encoding="utf-8") as out:
     for e in entries:
