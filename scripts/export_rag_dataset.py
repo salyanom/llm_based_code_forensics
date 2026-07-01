@@ -4,12 +4,14 @@ Writes `data/rag_export.jsonl` with objects:
   {"prompt":..., "meta": {...}, "source_entry": {...}}
 
 Usage:
-  python scripts/export_rag_dataset.py
+    python scripts/export_rag_dataset.py
+    python scripts/export_rag_dataset.py --primevul
 
 You can set environment variables to control behavior:
   RAG_EMBED_MODEL - sentence-transformers model id (default: all-MiniLM-L6-v2)
   RAG_MAX_PRIMEVUL_RECORDS - if set, limits how many PrimeVul records are loaded
 """
+import argparse
 import os
 import sys
 import json
@@ -25,9 +27,14 @@ OUT_DIR = os.path.join(ROOT, "data")
 os.makedirs(OUT_DIR, exist_ok=True)
 OUT_PATH = os.path.join(OUT_DIR, "rag_export.jsonl")
 
-# By default export only local `knowledge/` files to avoid long HF/model downloads.
-# Set environment variable RAG_EXPORT_PRIMEVUL=1 to attempt exporting PrimeVul (may download from HF).
-EXPORT_PRIMEVUL = os.getenv("RAG_EXPORT_PRIMEVUL", "0") == "1"
+def parse_args():
+    parser = argparse.ArgumentParser(description="Export normalized dataset rows to JSONL.")
+    parser.add_argument(
+        "--primevul",
+        action="store_true",
+        help="Also export PrimeVul from Hugging Face using services.rag_engine.",
+    )
+    return parser.parse_args()
 
 def load_local_knowledge():
     knowledge_dir = os.path.join(os.getcwd(), "knowledge")
@@ -129,8 +136,10 @@ def load_local_knowledge():
 
     return entries
 
+args = parse_args()
+
 entries = load_local_knowledge()
-if EXPORT_PRIMEVUL:
+if args.primevul or os.getenv("RAG_EXPORT_PRIMEVUL", "0") == "1":
     # Attempt heavy export using RAGEngine (may download). Use only when explicitly requested.
     try:
         from services.rag_engine import RAGEngine
