@@ -134,9 +134,10 @@ class _ActBtn(tk.Label):
 
 
 class _SectionLabel(tk.Label):
-    def __init__(self, master, text: str, **kw):
-        super().__init__(master, text=text, bg=C["bg_sidebar"], fg=C["fg_muted"],
-                         font=(C["font_ui"], 8, "bold"), anchor="w", padx=12, pady=(8, 4), **kw)
+    def __init__(self, master, text: str, right_sidebar=False, **kw):
+        bg = C["bg_right"] if right_sidebar else C["bg_sidebar"]
+        super().__init__(master, text=text, bg=bg, fg=C["fg_muted"],
+                         font=(C["font_ui"], 8, "bold"), anchor="w", padx=12, pady=6, **kw)
 
 
 class _Separator(tk.Frame):
@@ -438,12 +439,12 @@ class SecureCodeForensicsIDE(tk.Tk):
     def _build_right_sidebar(self):
         rs = self._right_sidebar
 
-        _SectionLabel(rs, "VULNERABILITY DETAILS").pack(fill=tk.X, padx=0)
+        _SectionLabel(rs, "VULNERABILITY DETAILS", right_sidebar=True).pack(fill=tk.X, padx=0)
         _Separator(rs).pack(fill=tk.X)
 
         # Summary badges
-        badge_row = tk.Frame(rs, bg=C["bg_right"], pady=8)
-        badge_row.pack(fill=tk.X, padx=12)
+        badge_row = tk.Frame(rs, bg=C["bg_right"])
+        badge_row.pack(fill=tk.X, padx=12, pady=8)
 
         self._badge_sev = self._make_badge(badge_row, "—", C["fg_muted"])
         self._badge_sev.pack(side=tk.LEFT)
@@ -494,7 +495,7 @@ class SecureCodeForensicsIDE(tk.Tk):
 
     def _build_detail_section(self, title: str, fields: List[str]):
         tk.Label(self._detail_frame, text=title, bg=C["bg_right"], fg=C["fg_muted"],
-                 font=(C["font_ui"], 8, "bold"), anchor="w", padx=12, pady=(10,2)
+                 font=(C["font_ui"], 8, "bold"), anchor="w", padx=12, pady=6
                  ).pack(fill=tk.X)
         for field in fields:
             row = tk.Frame(self._detail_frame, bg=C["bg_right"])
