@@ -59,6 +59,15 @@ data/rag_export_labeled.jsonl
 data/token_counts.json
 data/dataset_candidates.jsonl
 data/merged_dataset.jsonl
+data/*.npz
+
+# Runtime caches and local databases
+cache/
+checkpoints/
+database/*.db
+database/*.sqlite
+tests_tmp_db/
+tests_tmp_cache/
 
 # Local activation environment
 Activate.ps1/

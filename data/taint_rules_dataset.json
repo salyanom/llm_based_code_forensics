@@ -1,0 +1,88 @@
+{
+  "c": {
+    "sources": ["gets", "scanf", "fgets", "fgetc", "fread", "recv", "read", "getenv", "recvfrom", "recvmsg", "getchar"],
+    "sinks": {
+      "system": {"cwe": "CWE-78", "severity": "Critical", "description": "OS Command Injection via system() sink."},
+      "exec": {"cwe": "CWE-78", "severity": "Critical", "description": "OS Command Injection via exec() family."},
+      "execl": {"cwe": "CWE-78", "severity": "Critical", "description": "OS Command Injection via execl() sink."},
+      "execv": {"cwe": "CWE-78", "severity": "Critical", "description": "OS Command Injection via execv() sink."},
+      "popen": {"cwe": "CWE-78", "severity": "High", "description": "Command Execution via popen()."},
+      "strcpy": {"cwe": "CWE-120", "severity": "High", "description": "Classic Buffer Overflow via unbounded strcpy()."},
+      "sprintf": {"cwe": "CWE-120", "severity": "High", "description": "Buffer Overflow via sprintf()."},
+      "vsprintf": {"cwe": "CWE-120", "severity": "High", "description": "Buffer Overflow via vsprintf()."},
+      "printf": {"cwe": "CWE-134", "severity": "Medium", "description": "Uncontrolled Format String vulnerability."},
+      "fprintf": {"cwe": "CWE-134", "severity": "Medium", "description": "Uncontrolled Format String in fprintf()."},
+      "strcat": {"cwe": "CWE-120", "severity": "High", "description": "Buffer Overflow via strcat()."}
+    },
+    "propagators": ["strcpy", "strcat", "memcpy", "strncpy", "memmove", "strdup", "strndup"],
+    "sanitizers": ["strncpy", "snprintf", "vsnprintf", "fgets", "strlcpy", "strlcat"]
+  },
+  "cpp": {
+    "sources": ["std::cin", "cin", "gets", "scanf", "fgets", "recv", "read", "getenv", "recvfrom"],
+    "sinks": {
+      "system": {"cwe": "CWE-78", "severity": "Critical", "description": "OS Command Injection via system() sink."},
+      "std::system": {"cwe": "CWE-78", "severity": "Critical", "description": "OS Command Injection via std::system()."},
+      "strcpy": {"cwe": "CWE-120", "severity": "High", "description": "Buffer Overflow via C-style strcpy() in C++."},
+      "std::strcpy": {"cwe": "CWE-120", "severity": "High", "description": "Buffer Overflow via std::strcpy()."},
+      "sprintf": {"cwe": "CWE-120", "severity": "High", "description": "Buffer Overflow via sprintf() in C++."},
+      "printf": {"cwe": "CWE-134", "severity": "Medium", "description": "Format String vulnerability in C++."}
+    },
+    "propagators": ["strcpy", "strcat", "memcpy", "std::string::append", "std::string::assign", "std::copy"],
+    "sanitizers": ["snprintf", "strncpy", "std::string::substr", "std::regex_replace"]
+  },
+  "python": {
+    "sources": ["input", "read", "recv", "getenv", "os.getenv", "os.environ.get", "request.args.get", "request.form.get", "request.get_json", "sys.stdin.read"],
+    "sinks": {
+      "eval": {"cwe": "CWE-95", "severity": "Critical", "description": "Code Injection via dynamic eval() execution."},
+      "exec": {"cwe": "CWE-95", "severity": "Critical", "description": "Code Injection via dynamic exec() execution."},
+      "os.system": {"cwe": "CWE-78", "severity": "Critical", "description": "OS Command Injection via os.system()."},
+      "subprocess.run": {"cwe": "CWE-78", "severity": "High", "description": "Potential Command Injection if shell=True."},
+      "subprocess.call": {"cwe": "CWE-78", "severity": "High", "description": "Potential Command Injection via subprocess.call()."},
+      "subprocess.Popen": {"cwe": "CWE-78", "severity": "High", "description": "Command Execution via subprocess.Popen()."},
+      "popen": {"cwe": "CWE-78", "severity": "High", "description": "Command Execution via popen()."},
+      "pickle.loads": {"cwe": "CWE-502", "severity": "Critical", "description": "Untrusted Deserialization via pickle."},
+      "yaml.load": {"cwe": "CWE-502", "severity": "High", "description": "Unsafe YAML deserialization."},
+      "cursor.execute": {"cwe": "CWE-89", "severity": "High", "description": "SQL Injection via string-formatted SQL query."}
+    },
+    "propagators": ["format", "join", "replace", "f-string"],
+    "sanitizers": ["shlex.quote", "html.escape", "bleach.clean", "urllib.parse.quote", "markupsafe.escape"]
+  },
+  "java": {
+    "sources": ["System.getenv", "System.getProperty", "request.getParameter", "request.getHeader", "Scanner.nextLine", "BufferedReader.readLine"],
+    "sinks": {
+      "Runtime.getRuntime().exec": {"cwe": "CWE-78", "severity": "Critical", "description": "OS Command Injection via Runtime.exec()."},
+      "ProcessBuilder.start": {"cwe": "CWE-78", "severity": "High", "description": "Command Execution via ProcessBuilder."},
+      "Statement.executeQuery": {"cwe": "CWE-89", "severity": "Critical", "description": "SQL Injection via concatenated query."},
+      "InitialContext.lookup": {"cwe": "CWE-917", "severity": "Critical", "description": "JNDI / Expression Language Injection."},
+      "ObjectInputStream.readObject": {"cwe": "CWE-502", "severity": "Critical", "description": "Untrusted Java Deserialization."}
+    },
+    "propagators": ["StringBuilder.append", "StringBuffer.append", "String.concat", "String.format"],
+    "sanitizers": ["PreparedStatement.setString", "PreparedStatement.setInt", "StringEscapeUtils.escapeHtml4", "URLEncoder.encode"]
+  },
+  "javascript": {
+    "sources": ["req.query", "req.body", "req.params", "req.headers", "process.env", "document.location", "window.location"],
+    "sinks": {
+      "eval": {"cwe": "CWE-95", "severity": "Critical", "description": "Remote Code Execution via JavaScript eval()."},
+      "Function": {"cwe": "CWE-95", "severity": "Critical", "description": "Code Execution via Function constructor."},
+      "exec": {"cwe": "CWE-78", "severity": "Critical", "description": "Command Injection via child_process.exec."},
+      "execSync": {"cwe": "CWE-78", "severity": "Critical", "description": "Command Injection via child_process.execSync."},
+      "innerHTML": {"cwe": "CWE-79", "severity": "High", "description": "Cross-Site Scripting (XSS) via innerHTML assignment."},
+      "document.write": {"cwe": "CWE-79", "severity": "High", "description": "DOM-based XSS via document.write()."}
+    },
+    "propagators": ["concat", "join", "replace", "split", "slice", "template_string"],
+    "sanitizers": ["encodeURIComponent", "DOMPurify.sanitize", "validator.escape", "xss"]
+  },
+  "typescript": {
+    "sources": ["req.query", "req.body", "req.params", "req.headers", "process.env", "document.location", "window.location"],
+    "sinks": {
+      "eval": {"cwe": "CWE-95", "severity": "Critical", "description": "Remote Code Execution via TypeScript eval()."},
+      "Function": {"cwe": "CWE-95", "severity": "Critical", "description": "Code Execution via Function constructor."},
+      "exec": {"cwe": "CWE-78", "severity": "Critical", "description": "Command Injection via child_process.exec."},
+      "execSync": {"cwe": "CWE-78", "severity": "Critical", "description": "Command Injection via child_process.execSync."},
+      "innerHTML": {"cwe": "CWE-79", "severity": "High", "description": "Cross-Site Scripting (XSS) via innerHTML."},
+      "document.write": {"cwe": "CWE-79", "severity": "High", "description": "DOM-based XSS via document.write()."}
+    },
+    "propagators": ["concat", "join", "replace", "split", "slice", "template_string"],
+    "sanitizers": ["encodeURIComponent", "DOMPurify.sanitize", "validator.escape", "xss"]
+  }
+}

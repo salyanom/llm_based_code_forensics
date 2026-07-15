@@ -1,0 +1,378 @@
+[
+  {
+    "text": "Analyze the following CodeSample sample (Unknown) for security issues and return JSON:\nCode/Text:\n#include <stdio.h>\n#include <stdlib.h>\n\nvoid process_user_command() {\n    char command[256];\n    char user_input[100];\n\n    // SOURCE: Reading untru\\\\\\\\sted user input\n    printf(\"Enter filename to delete: \");\n    gets(user_input);\n\n    // VULNERABILITY: Constructing a command blindly\n    sprintf(command, \"rm %s\", user_input);\n\n    // SINK: Executing the command\n    // If user types \"; rm -rf /\", the system dies.\n    system(command);\n}\n\nRespond only with JSON.",
+    "source": "CodeSample",
+    "cwe": "Unknown",
+    "cve": "Unknown",
+    "title": "file1.c",
+    "description": "{\"vulnerabilities\": [{\"type\": \"Unknown\", \"cve\": \"Unknown\", \"description\": \"Sample from file1.c\"}], \"suggested_patch\": \"Review input boundaries and apply sanitization.\"}"
+  },
+  {
+    "text": "Analyze the following CodeSample sample (Unknown) for security issues and return JSON:\nCode/Text:\n#include <string.h>\n#include <stdio.h>\n\nvoid copy_name(char *user_name) {\n    char buffer[10]; // Tiny buffer (size 10)\n\n    // SINK + SOURCE combined\n    // strcpy doesn't check size. If user_name is 20 chars, this crashes.\n    strcpy(buffer, user_name);\n\n    printf(\"Hello %s\\n\", buffer);\n}\n\nRespond only with JSON.",
+    "source": "CodeSample",
+    "cwe": "Unknown",
+    "cve": "Unknown",
+    "title": "file2.c",
+    "description": "{\"vulnerabilities\": [{\"type\": \"Unknown\", \"cve\": \"Unknown\", \"description\": \"Sample from file2.c\"}], \"suggested_patch\": \"Review input boundaries and apply sanitization.\"}"
+  },
+  {
+    "text": "Analyze the following CodeSample sample (Unknown) for security issues and return JSON:\nCode/Text:\n#include <stdio.h>\n#include <stdlib.h>\n\nint main(){\n    char input[100];\n    gets(input);\n    system(input);\n}\n\nRespond only with JSON.",
+    "source": "CodeSample",
+    "cwe": "Unknown",
+    "cve": "Unknown",
+    "title": "file3.c",
+    "description": "{\"vulnerabilities\": [{\"type\": \"Unknown\", \"cve\": \"Unknown\", \"description\": \"Sample from file3.c\"}], \"suggested_patch\": \"Review input boundaries and apply sanitization.\"}"
+  },
+  {
+    "text": "Language: c Sink: system CWE: CWE-78 Description: OS Command Injection via system() sink.",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "c system",
+    "description": "OS Command Injection via system() sink."
+  },
+  {
+    "text": "Language: c Sink: exec CWE: CWE-78 Description: OS Command Injection via exec() family.",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "c exec",
+    "description": "OS Command Injection via exec() family."
+  },
+  {
+    "text": "Language: c Sink: execl CWE: CWE-78 Description: OS Command Injection via execl() sink.",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "c execl",
+    "description": "OS Command Injection via execl() sink."
+  },
+  {
+    "text": "Language: c Sink: execv CWE: CWE-78 Description: OS Command Injection via execv() sink.",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "c execv",
+    "description": "OS Command Injection via execv() sink."
+  },
+  {
+    "text": "Language: c Sink: popen CWE: CWE-78 Description: Command Execution via popen().",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "c popen",
+    "description": "Command Execution via popen()."
+  },
+  {
+    "text": "Language: c Sink: strcpy CWE: CWE-120 Description: Classic Buffer Overflow via unbounded strcpy().",
+    "source": "RuleDataset",
+    "cwe": "CWE-120",
+    "cve": "Unknown",
+    "title": "c strcpy",
+    "description": "Classic Buffer Overflow via unbounded strcpy()."
+  },
+  {
+    "text": "Language: c Sink: sprintf CWE: CWE-120 Description: Buffer Overflow via sprintf().",
+    "source": "RuleDataset",
+    "cwe": "CWE-120",
+    "cve": "Unknown",
+    "title": "c sprintf",
+    "description": "Buffer Overflow via sprintf()."
+  },
+  {
+    "text": "Language: c Sink: vsprintf CWE: CWE-120 Description: Buffer Overflow via vsprintf().",
+    "source": "RuleDataset",
+    "cwe": "CWE-120",
+    "cve": "Unknown",
+    "title": "c vsprintf",
+    "description": "Buffer Overflow via vsprintf()."
+  },
+  {
+    "text": "Language: c Sink: printf CWE: CWE-134 Description: Uncontrolled Format String vulnerability.",
+    "source": "RuleDataset",
+    "cwe": "CWE-134",
+    "cve": "Unknown",
+    "title": "c printf",
+    "description": "Uncontrolled Format String vulnerability."
+  },
+  {
+    "text": "Language: c Sink: fprintf CWE: CWE-134 Description: Uncontrolled Format String in fprintf().",
+    "source": "RuleDataset",
+    "cwe": "CWE-134",
+    "cve": "Unknown",
+    "title": "c fprintf",
+    "description": "Uncontrolled Format String in fprintf()."
+  },
+  {
+    "text": "Language: c Sink: strcat CWE: CWE-120 Description: Buffer Overflow via strcat().",
+    "source": "RuleDataset",
+    "cwe": "CWE-120",
+    "cve": "Unknown",
+    "title": "c strcat",
+    "description": "Buffer Overflow via strcat()."
+  },
+  {
+    "text": "Language: cpp Sink: system CWE: CWE-78 Description: OS Command Injection via system() sink.",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "cpp system",
+    "description": "OS Command Injection via system() sink."
+  },
+  {
+    "text": "Language: cpp Sink: std::system CWE: CWE-78 Description: OS Command Injection via std::system().",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "cpp std::system",
+    "description": "OS Command Injection via std::system()."
+  },
+  {
+    "text": "Language: cpp Sink: strcpy CWE: CWE-120 Description: Buffer Overflow via C-style strcpy() in C++.",
+    "source": "RuleDataset",
+    "cwe": "CWE-120",
+    "cve": "Unknown",
+    "title": "cpp strcpy",
+    "description": "Buffer Overflow via C-style strcpy() in C++."
+  },
+  {
+    "text": "Language: cpp Sink: std::strcpy CWE: CWE-120 Description: Buffer Overflow via std::strcpy().",
+    "source": "RuleDataset",
+    "cwe": "CWE-120",
+    "cve": "Unknown",
+    "title": "cpp std::strcpy",
+    "description": "Buffer Overflow via std::strcpy()."
+  },
+  {
+    "text": "Language: cpp Sink: sprintf CWE: CWE-120 Description: Buffer Overflow via sprintf() in C++.",
+    "source": "RuleDataset",
+    "cwe": "CWE-120",
+    "cve": "Unknown",
+    "title": "cpp sprintf",
+    "description": "Buffer Overflow via sprintf() in C++."
+  },
+  {
+    "text": "Language: cpp Sink: printf CWE: CWE-134 Description: Format String vulnerability in C++.",
+    "source": "RuleDataset",
+    "cwe": "CWE-134",
+    "cve": "Unknown",
+    "title": "cpp printf",
+    "description": "Format String vulnerability in C++."
+  },
+  {
+    "text": "Language: python Sink: eval CWE: CWE-95 Description: Code Injection via dynamic eval() execution.",
+    "source": "RuleDataset",
+    "cwe": "CWE-95",
+    "cve": "Unknown",
+    "title": "python eval",
+    "description": "Code Injection via dynamic eval() execution."
+  },
+  {
+    "text": "Language: python Sink: exec CWE: CWE-95 Description: Code Injection via dynamic exec() execution.",
+    "source": "RuleDataset",
+    "cwe": "CWE-95",
+    "cve": "Unknown",
+    "title": "python exec",
+    "description": "Code Injection via dynamic exec() execution."
+  },
+  {
+    "text": "Language: python Sink: os.system CWE: CWE-78 Description: OS Command Injection via os.system().",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "python os.system",
+    "description": "OS Command Injection via os.system()."
+  },
+  {
+    "text": "Language: python Sink: subprocess.run CWE: CWE-78 Description: Potential Command Injection if shell=True.",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "python subprocess.run",
+    "description": "Potential Command Injection if shell=True."
+  },
+  {
+    "text": "Language: python Sink: subprocess.call CWE: CWE-78 Description: Potential Command Injection via subprocess.call().",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "python subprocess.call",
+    "description": "Potential Command Injection via subprocess.call()."
+  },
+  {
+    "text": "Language: python Sink: subprocess.Popen CWE: CWE-78 Description: Command Execution via subprocess.Popen().",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "python subprocess.Popen",
+    "description": "Command Execution via subprocess.Popen()."
+  },
+  {
+    "text": "Language: python Sink: popen CWE: CWE-78 Description: Command Execution via popen().",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "python popen",
+    "description": "Command Execution via popen()."
+  },
+  {
+    "text": "Language: python Sink: pickle.loads CWE: CWE-502 Description: Untrusted Deserialization via pickle.",
+    "source": "RuleDataset",
+    "cwe": "CWE-502",
+    "cve": "Unknown",
+    "title": "python pickle.loads",
+    "description": "Untrusted Deserialization via pickle."
+  },
+  {
+    "text": "Language: python Sink: yaml.load CWE: CWE-502 Description: Unsafe YAML deserialization.",
+    "source": "RuleDataset",
+    "cwe": "CWE-502",
+    "cve": "Unknown",
+    "title": "python yaml.load",
+    "description": "Unsafe YAML deserialization."
+  },
+  {
+    "text": "Language: python Sink: cursor.execute CWE: CWE-89 Description: SQL Injection via string-formatted SQL query.",
+    "source": "RuleDataset",
+    "cwe": "CWE-89",
+    "cve": "Unknown",
+    "title": "python cursor.execute",
+    "description": "SQL Injection via string-formatted SQL query."
+  },
+  {
+    "text": "Language: java Sink: Runtime.getRuntime().exec CWE: CWE-78 Description: OS Command Injection via Runtime.exec().",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "java Runtime.getRuntime().exec",
+    "description": "OS Command Injection via Runtime.exec()."
+  },
+  {
+    "text": "Language: java Sink: ProcessBuilder.start CWE: CWE-78 Description: Command Execution via ProcessBuilder.",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "java ProcessBuilder.start",
+    "description": "Command Execution via ProcessBuilder."
+  },
+  {
+    "text": "Language: java Sink: Statement.executeQuery CWE: CWE-89 Description: SQL Injection via concatenated query.",
+    "source": "RuleDataset",
+    "cwe": "CWE-89",
+    "cve": "Unknown",
+    "title": "java Statement.executeQuery",
+    "description": "SQL Injection via concatenated query."
+  },
+  {
+    "text": "Language: java Sink: InitialContext.lookup CWE: CWE-917 Description: JNDI / Expression Language Injection.",
+    "source": "RuleDataset",
+    "cwe": "CWE-917",
+    "cve": "Unknown",
+    "title": "java InitialContext.lookup",
+    "description": "JNDI / Expression Language Injection."
+  },
+  {
+    "text": "Language: java Sink: ObjectInputStream.readObject CWE: CWE-502 Description: Untrusted Java Deserialization.",
+    "source": "RuleDataset",
+    "cwe": "CWE-502",
+    "cve": "Unknown",
+    "title": "java ObjectInputStream.readObject",
+    "description": "Untrusted Java Deserialization."
+  },
+  {
+    "text": "Language: javascript Sink: eval CWE: CWE-95 Description: Remote Code Execution via JavaScript eval().",
+    "source": "RuleDataset",
+    "cwe": "CWE-95",
+    "cve": "Unknown",
+    "title": "javascript eval",
+    "description": "Remote Code Execution via JavaScript eval()."
+  },
+  {
+    "text": "Language: javascript Sink: Function CWE: CWE-95 Description: Code Execution via Function constructor.",
+    "source": "RuleDataset",
+    "cwe": "CWE-95",
+    "cve": "Unknown",
+    "title": "javascript Function",
+    "description": "Code Execution via Function constructor."
+  },
+  {
+    "text": "Language: javascript Sink: exec CWE: CWE-78 Description: Command Injection via child_process.exec.",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "javascript exec",
+    "description": "Command Injection via child_process.exec."
+  },
+  {
+    "text": "Language: javascript Sink: execSync CWE: CWE-78 Description: Command Injection via child_process.execSync.",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "javascript execSync",
+    "description": "Command Injection via child_process.execSync."
+  },
+  {
+    "text": "Language: javascript Sink: innerHTML CWE: CWE-79 Description: Cross-Site Scripting (XSS) via innerHTML assignment.",
+    "source": "RuleDataset",
+    "cwe": "CWE-79",
+    "cve": "Unknown",
+    "title": "javascript innerHTML",
+    "description": "Cross-Site Scripting (XSS) via innerHTML assignment."
+  },
+  {
+    "text": "Language: javascript Sink: document.write CWE: CWE-79 Description: DOM-based XSS via document.write().",
+    "source": "RuleDataset",
+    "cwe": "CWE-79",
+    "cve": "Unknown",
+    "title": "javascript document.write",
+    "description": "DOM-based XSS via document.write()."
+  },
+  {
+    "text": "Language: typescript Sink: eval CWE: CWE-95 Description: Remote Code Execution via TypeScript eval().",
+    "source": "RuleDataset",
+    "cwe": "CWE-95",
+    "cve": "Unknown",
+    "title": "typescript eval",
+    "description": "Remote Code Execution via TypeScript eval()."
+  },
+  {
+    "text": "Language: typescript Sink: Function CWE: CWE-95 Description: Code Execution via Function constructor.",
+    "source": "RuleDataset",
+    "cwe": "CWE-95",
+    "cve": "Unknown",
+    "title": "typescript Function",
+    "description": "Code Execution via Function constructor."
+  },
+  {
+    "text": "Language: typescript Sink: exec CWE: CWE-78 Description: Command Injection via child_process.exec.",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "typescript exec",
+    "description": "Command Injection via child_process.exec."
+  },
+  {
+    "text": "Language: typescript Sink: execSync CWE: CWE-78 Description: Command Injection via child_process.execSync.",
+    "source": "RuleDataset",
+    "cwe": "CWE-78",
+    "cve": "Unknown",
+    "title": "typescript execSync",
+    "description": "Command Injection via child_process.execSync."
+  },
+  {
+    "text": "Language: typescript Sink: innerHTML CWE: CWE-79 Description: Cross-Site Scripting (XSS) via innerHTML.",
+    "source": "RuleDataset",
+    "cwe": "CWE-79",
+    "cve": "Unknown",
+    "title": "typescript innerHTML",
+    "description": "Cross-Site Scripting (XSS) via innerHTML."
+  },
+  {
+    "text": "Language: typescript Sink: document.write CWE: CWE-79 Description: DOM-based XSS via document.write().",
+    "source": "RuleDataset",
+    "cwe": "CWE-79",
+    "cve": "Unknown",
+    "title": "typescript document.write",
+    "description": "DOM-based XSS via document.write()."
+  }
+]

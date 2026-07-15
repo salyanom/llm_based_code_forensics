@@ -1,0 +1,40 @@
+{
+  "llm_provider": "ollama",
+  "llm_model": "deepseek-coder:6.7b",
+  "llm_endpoint": "http://localhost:59999/api/chat",
+  "llm_temperature": 0.1,
+  "llm_max_tokens": 1024,
+  "llm_timeout_sec": 45,
+  "embedding_model": "all-MiniLM-L6-v2",
+  "qdrant_url": "http://localhost:6333",
+  "qdrant_collection": "code_forensics_knowledge",
+  "qdrant_timeout_sec": 30,
+  "ignore_dirs": [
+    ".git",
+    "venv",
+    ".env",
+    "node_modules",
+    "build",
+    "dist",
+    "__pycache__",
+    ".idea",
+    ".vscode",
+    "qdrant_storage"
+  ],
+  "supported_extensions": [
+    ".c",
+    ".cpp",
+    ".h",
+    ".hpp",
+    ".py",
+    ".js",
+    ".ts",
+    ".java"
+  ],
+  "max_file_size_bytes": 1048576,
+  "db_path": "database/forensics_ide.db",
+  "log_level": "INFO",
+  "ui_theme": "dark",
+  "max_primevul_records": 500,
+  "nvd_live_enabled": true
+}
