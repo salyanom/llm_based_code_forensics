@@ -1,7 +1,7 @@
 {
   "llm_provider": "ollama",
   "llm_model": "deepseek-coder:6.7b",
-  "llm_endpoint": "http://localhost:59999/api/chat",
+  "llm_endpoint": "http://localhost:11434/api/chat",
   "llm_temperature": 0.1,
   "llm_max_tokens": 1024,
   "llm_timeout_sec": 45,
