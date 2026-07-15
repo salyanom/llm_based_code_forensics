@@ -109,14 +109,20 @@ class TestModularSecurityIDE(unittest.TestCase):
 
     def test_08_llm_engine_offline(self):
         cfg = ConfigManager.get_instance()
-        cfg.set("llm_provider", "ollama")
-        cfg.set("llm_endpoint", "http://localhost:59999/api/chat")  # Invalid offline port
-        eng = LLMEngine()
-        status = eng.check_connection()
-        self.assertEqual(status["status"], "OFFLINE")
+        orig_provider = cfg.get("llm_provider", "ollama")
+        orig_endpoint = cfg.get("llm_endpoint", "http://localhost:11434/api/chat")
+        try:
+            cfg.set("llm_provider", "ollama", auto_save=True)
+            cfg.set("llm_endpoint", "http://localhost:59999/api/chat", auto_save=True)
+            eng = LLMEngine()
+            status = eng.check_connection()
+            self.assertEqual(status["status"], "OFFLINE")
 
-        with self.assertRaises(LLMBackendOfflineError):
-            eng.execute_inference({"system_prompt": "test", "user_prompt": "test"}, max_retries=0)
+            with self.assertRaises(LLMBackendOfflineError):
+                eng.execute_inference({"system_prompt": "test", "user_prompt": "test"}, max_retries=0)
+        finally:
+            cfg.set("llm_provider", orig_provider, auto_save=True)
+            cfg.set("llm_endpoint", orig_endpoint, auto_save=True)
 
     def test_09_correlation_verification_explainability(self):
         corr = CorrelationModule()

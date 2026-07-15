@@ -22,7 +22,9 @@ class ExplainabilityModule:
         sources = corr.get("sources_in_scope", [])
 
         # 1. Why (Root cause from AST + LLM explanation if available)
-        llm_why = llm_resp.get("explanation", "") if isinstance(llm_resp, dict) else ""
+        llm_why = ""
+        if isinstance(llm_resp, dict):
+            llm_why = llm_resp.get("explanation") or llm_resp.get("why") or llm_resp.get("root_cause") or ""
         if llm_why:
             why_text = f"{llm_why}\n\nAST Trace: In function '{func_name}', untrusted data reaching '{sink}' at line {verified_finding.get('start_line')}: `{line_text}`"
         else:
@@ -39,10 +41,13 @@ class ExplainabilityModule:
 
         # 2. Supporting CWE
         cwe_desc = f"Official Classification: {cwe}. Memory corruption or injection failure due to improper boundary or syntax validation."
-        for m in rag_ctx.get("top_matches", []):
-            if m.get("cwe") == cwe and m.get("description"):
-                cwe_desc = f"{cwe}: {m['description']}"
-                break
+        if isinstance(llm_resp, dict) and llm_resp.get("cwe_description"):
+            cwe_desc = f"{cwe}: {llm_resp['cwe_description']}"
+        else:
+            for m in rag_ctx.get("top_matches", []):
+                if m.get("cwe") == cwe and m.get("description"):
+                    cwe_desc = f"{cwe}: {m['description']}"
+                    break
 
         # 3. Supporting CVE
         cve_desc = f"Associated CVE Reference: {cve}."
@@ -58,12 +63,18 @@ class ExplainabilityModule:
             primevul_example = f"// Similar insecure usage of {sink}\nchar buffer[64];\n{sink}(buffer, untrusted_input); // Unbounded copy"
 
         # 5. OWASP Recommendation
-        owasp_rec = rag_ctx.get("owasp_recommendation", "")
+        owasp_rec = ""
+        if isinstance(llm_resp, dict):
+            owasp_rec = llm_resp.get("owasp_recommendation") or llm_resp.get("remediation") or llm_resp.get("recommendation") or ""
+        if not owasp_rec:
+            owasp_rec = rag_ctx.get("owasp_recommendation", "")
         if not owasp_rec:
             owasp_rec = f"Never pass unvalidated or unbounded strings to `{sink}`. Use bounded alternatives (such as `strncpy` or `snprintf`) and enforce strict boundary checks."
 
         # 6. References
         references = rag_ctx.get("references", [])
+        if isinstance(llm_resp, dict) and isinstance(llm_resp.get("references"), list) and llm_resp.get("references"):
+            references = list(set(references + llm_resp["references"]))
         if not references:
             references = [f"OWASP Secure Coding Practices ({cwe})", f"CWE Dictionary Entry for {cwe}"]
 

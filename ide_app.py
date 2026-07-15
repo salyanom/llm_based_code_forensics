@@ -15,7 +15,13 @@ import os
 # Ensure project root is in Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from modules.ui_desktop import SecureCodeForensicsIDE
+try:
+    from modules.ui_desktop import SecureCodeForensicsIDE
+except ModuleNotFoundError as exc:
+    print(f"\n[Secure Code Forensics IDE] ERROR: Missing required dependency -> '{exc.name}'")
+    print("Please install all required project dependencies inside your virtual environment before launching:")
+    print("    pip install -r requirements.txt\n")
+    sys.exit(1)
 
 
 def main():

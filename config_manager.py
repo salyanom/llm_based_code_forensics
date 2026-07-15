@@ -56,17 +56,31 @@ class ConfigManager:
 
     def load(self) -> Dict[str, Any]:
         with self._data_lock:
+            source = "defaults"
             if os.path.exists(self.config_path):
                 try:
                     with open(self.config_path, "r", encoding="utf-8") as f:
                         loaded = json.load(f)
                         if isinstance(loaded, dict):
                             self._data.update(loaded)
+                            source = "config.json"
                 except Exception as exc:
                     print(f"[ConfigManager] Warning: Failed to load {self.config_path}: {exc}. Using defaults.")
             else:
                 self._save_internal()
+            
+            # Check environment variable overrides if explicitly set by system/user
+            env_endpoint = os.environ.get("LLM_ENDPOINT") or os.environ.get("OLLAMA_HOST")
+            if env_endpoint and "http" in env_endpoint:
+                self._data["llm_endpoint"] = env_endpoint
+                source = f"Environment Variable ({env_endpoint})"
+
+            print(f"[ConfigManager] Loaded LLM endpoint from:\n{source} -> {self._data.get('llm_endpoint')}")
             return dict(self._data)
+
+    def reload(self) -> Dict[str, Any]:
+        """Reload configuration from disk into memory to ensure consistency across modules."""
+        return self.load()
 
     def save(self) -> bool:
         with self._data_lock:

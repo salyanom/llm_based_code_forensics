@@ -25,14 +25,24 @@ class LLMService:
     def _extract_json_array(content: str) -> List[Dict[str, Any]]:
         start = content.find("[")
         end = content.rfind("]")
-        if start == -1 or end == -1 or end < start:
-            return []
-        try:
-            payload = json.loads(content[start:end + 1])
-            if isinstance(payload, list):
-                return [item for item in payload if isinstance(item, dict)]
-        except Exception:
-            return []
+        if start != -1 and end != -1 and end > start:
+            try:
+                payload = json.loads(content[start:end + 1])
+                if isinstance(payload, list):
+                    return [item for item in payload if isinstance(item, dict)]
+            except Exception:
+                pass
+        
+        # Check if single dict was returned instead of array
+        start_obj = content.find("{")
+        end_obj = content.rfind("}")
+        if start_obj != -1 and end_obj != -1 and end_obj > start_obj:
+            try:
+                payload = json.loads(content[start_obj:end_obj + 1])
+                if isinstance(payload, dict):
+                    return [payload]
+            except Exception:
+                pass
         return []
 
     def analyze_vulnerabilities(self, finding: Dict[str, Any], rag_matches: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

@@ -77,6 +77,11 @@ class VerificationModule:
         if llm_response and isinstance(llm_response, dict):
             if llm_response.get("vulnerability_type") and llm_response["vulnerability_type"] != "Check Explanation":
                 cwe = llm_response["vulnerability_type"]
+            elif llm_response.get("cwe") and llm_response["cwe"] != "Unknown":
+                cwe = llm_response["cwe"]
+            elif llm_response.get("vulnerability") and llm_response["vulnerability"] != "Check Explanation":
+                cwe = llm_response["vulnerability"]
+
             if llm_response.get("cve") and llm_response["cve"] != "Unknown":
                 cve = llm_response["cve"]
 

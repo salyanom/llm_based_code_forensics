@@ -925,13 +925,19 @@ class SecureCodeForensicsIDE(tk.Tk):
             self._log(f"Correlation: {total_corr} candidates found", "INFO")
 
             # ── LLM Verify ─────────────────────────────────────────────────
-            llm_online = self.llm_engine.check_connection().get("status") == "ONLINE"
+            self.config_mgr.reload()
+            conn_status = self.llm_engine.check_connection()
+            llm_online = conn_status.get("status") == "ONLINE"
             if llm_online:
                 self._stage("llm", "running")
-                self._log("LLM online — running verification", "INFO")
+                latency = conn_status.get("latency_ms", 0)
+                model_name = conn_status.get("model", "?")
+                self._log(f"LLM online ({model_name}, {latency}ms) — running verification", "INFO")
             else:
                 self._stage("llm", "skip", "offline")
-                self._log("LLM offline — skipping inference", "WARNING")
+                err_info = conn_status.get("error") or conn_status.get("exception", "Unknown error")
+                self._log(f"LLM offline ({err_info}) — skipping inference", "WARNING")
+                print(f"[UI Pipeline] LLM offline status diagnostics: {conn_status}")
 
             # ── Verify + Patch + Explain ───────────────────────────────────
             self._stage("verify", "running")
@@ -948,8 +954,12 @@ class SecureCodeForensicsIDE(tk.Tk):
                             prompt = self.prompt_builder.build_verification_prompt(
                                 corr, corr.get("rag_context", {}), lang)
                             llm_resp = self.llm_engine.execute_inference(prompt)
-                        except Exception:
-                            pass
+                        except Exception as exc:
+                            import traceback
+                            tb_str = traceback.format_exc()
+                            err_msg = f"Inference exception for {corr.get('function_name', '?')} in {os.path.basename(fpath)}: {exc.__class__.__name__}: {exc}"
+                            print(f"[UI Pipeline Error] {err_msg}\n{tb_str}")
+                            self._log(err_msg, "ERROR")
 
                     verified = self.verification_module.verify_finding(corr, llm_resp)
                     if verified.get("severity") != "Info" and verified.get("confidence", 0) >= 40:
@@ -1341,6 +1351,7 @@ class SecureCodeForensicsIDE(tk.Tk):
                          insertbackground=C["cursor"], relief=tk.FLAT, font=(C["font_mono"], 9))
             e.pack(fill=tk.X, padx=20)
 
+        self.config_mgr.reload()
         _lbl("LLM Provider")
         provider_var = tk.StringVar(value=self.config_mgr.get("llm_provider", "ollama"))
         ttk.Combobox(win, textvariable=provider_var,
