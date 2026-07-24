@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import threading
 from datetime import datetime
 import tkinter as tk
@@ -225,15 +228,17 @@ class SecureCodeForensicsIDE(tk.Tk):
         self.configure(bg=C["bg_editor"])
 
         # Modules
+        from core.orchestration.pipeline import SecurityPipeline
+        self.pipeline = SecurityPipeline()
         self.config_mgr = ConfigManager.get_instance()
-        self.parser_module = ASTParserModule()
+        
+        from modules.persistence import PersistenceModule
+        self.persistence = PersistenceModule.get_instance()
+        
+        from modules.llm_engine import LLMEngine, LLMBackendOfflineError
+        from modules.prompt_builder import PromptBuilderModule
         self.prompt_builder = PromptBuilderModule()
         self.llm_engine = LLMEngine(self.prompt_builder)
-        self.correlation_module = CorrelationModule()
-        self.verification_module = VerificationModule()
-        self.explainability_module = ExplainabilityModule()
-        self.patch_module = PatchGenerationModule(self.parser_module)
-        self.persistence = PersistenceModule.get_instance()
 
         # State
         self.current_project_folder: Optional[str] = None
@@ -892,113 +897,25 @@ class SecureCodeForensicsIDE(tk.Tk):
         self.after(0, lambda: self._progress_win.set_stage(key, status, detail))
 
     def _run_scan_pipeline(self):
-        import time
         try:
-            start_t = time.time()
             force_reparse = not self.incremental_var.get()
-            self._log(f"Scan started (incremental={not force_reparse})", "STAGE")
-
-            # ── Parse ──────────────────────────────────────────────────────
-            self._stage("parse", "running")
-            parser_res = self.parser_module.scan_project(self.current_project_folder,
-                                                          force_reparse=force_reparse)
-            file_results = parser_res.get("file_results", {})
-            scanned = parser_res.get("files_scanned", 0)
-            cached = parser_res.get("files_from_cache", 0)
-            self._stage("parse", "done", f"{scanned} files ({cached} cached)")
-            self._log(f"Parser: {scanned} files scanned, {cached} from cache", "INFO")
-
-            self.current_scan_id = self.persistence.create_scan_run(
-                self.current_project_id or 1, scanned, 0)
-
-            all_findings: List[Dict[str, Any]] = []
+            
+            result = self.pipeline.run_scan(
+                project_folder=self.current_project_folder,
+                project_id=self.current_project_id or 1,
+                force_reparse=force_reparse,
+                stage_callback=self._stage,
+                log_callback=self._log
+            )
+            
+            self.current_scan_id = result["scan_id"]
+            self.vulnerabilities_list = result["vulnerabilities"]
+            
             self.file_badges.clear()
-
-            # ── Correlate ──────────────────────────────────────────────────
-            self._stage("correlate", "running")
-            for fpath, analysis in file_results.items():
-                lang = analysis.get("language", "unknown")
-                correlated = self.correlation_module.correlate_file_findings(fpath, lang, analysis)
-                analysis["_correlated"] = correlated
-            total_corr = sum(len(a.get("_correlated", [])) for a in file_results.values())
-            self._stage("correlate", "done", f"{total_corr} candidates")
-            self._log(f"Correlation: {total_corr} candidates found", "INFO")
-
-            # ── LLM Verify ─────────────────────────────────────────────────
-            self.config_mgr.reload()
-            conn_status = self.llm_engine.check_connection()
-            llm_online = conn_status.get("status") == "ONLINE"
-            if llm_online:
-                self._stage("llm", "running")
-                latency = conn_status.get("latency_ms", 0)
-                model_name = conn_status.get("model", "?")
-                self._log(f"LLM online ({model_name}, {latency}ms) — running verification", "INFO")
-            else:
-                self._stage("llm", "skip", "offline")
-                err_info = conn_status.get("error") or conn_status.get("exception", "Unknown error")
-                self._log(f"LLM offline ({err_info}) — skipping inference", "WARNING")
-                print(f"[UI Pipeline] LLM offline status diagnostics: {conn_status}")
-
-            # ── Verify + Patch + Explain ───────────────────────────────────
-            self._stage("verify", "running")
-            self._stage("patch", "running")
-            self._stage("explain", "running")
-
-            for fpath, analysis in file_results.items():
-                lang = analysis.get("language", "unknown")
-                file_count = 0
-                for corr in analysis.get("_correlated", []):
-                    llm_resp: Dict[str, Any] = {}
-                    if llm_online:
-                        try:
-                            prompt = self.prompt_builder.build_verification_prompt(
-                                corr, corr.get("rag_context", {}), lang)
-                            llm_resp = self.llm_engine.execute_inference(prompt)
-                        except Exception as exc:
-                            import traceback
-                            tb_str = traceback.format_exc()
-                            err_msg = f"Inference exception for {corr.get('function_name', '?')} in {os.path.basename(fpath)}: {exc.__class__.__name__}: {exc}"
-                            print(f"[UI Pipeline Error] {err_msg}\n{tb_str}")
-                            self._log(err_msg, "ERROR")
-
-                    verified = self.verification_module.verify_finding(corr, llm_resp)
-                    if verified.get("severity") != "Info" and verified.get("confidence", 0) >= 40:
-                        patch_info = self.patch_module.generate_patch_for_finding(verified)
-                        verified["patch_diff"] = patch_info.get("unified_diff", "")
-                        verified["patched_snippet"] = patch_info.get("patched_snippet", "")
-                        verified["explanation_json"] = (
-                            self.explainability_module.generate_evidence_explanation(verified))
-                        all_findings.append(verified)
-                        file_count += 1
-
-                if file_count > 0:
-                    self.file_badges[fpath] = f"● {file_count}"
-
-            if llm_online:
-                self._stage("llm", "done")
-            self._stage("verify",  "done", f"{len(all_findings)} findings verified")
-            self._stage("patch",   "done")
-            self._stage("explain", "done")
-
-            # ── Persist ────────────────────────────────────────────────────
-            self._stage("persist", "running")
-            self.persistence.save_vulnerabilities(self.current_scan_id, all_findings)
-            self.persistence.update_scan_findings_count(self.current_scan_id, len(all_findings))
-            self._stage("persist", "done", f"{len(all_findings)} records written")
-            self._log(f"Persistence: {len(all_findings)} records saved", "INFO")
-
-            self.vulnerabilities_list = sorted(
-                all_findings,
-                key=lambda x: (x.get("cvss_score", 0), x.get("confidence", 0)),
-                reverse=True)
-
-            elapsed = round(time.time() - start_t, 3)
-            msg = (f"Scan done in {elapsed}s  |  "
-                   f"{scanned} files  ({cached} cached)  |  "
-                   f"{len(self.vulnerabilities_list)} findings")
-            self._log(msg, "INFO")
-            self.persistence.log_scan_message(self.current_scan_id, msg)
-
+            for fpath, count in result["badge_counts"].items():
+                self.file_badges[fpath] = f"● {count}"
+                
+            msg = result["message"]
             self._stage("done", "done", msg)
             self.after(10, lambda: self._on_scan_completed(msg))
         except Exception as exc:
@@ -1398,3 +1315,7 @@ class SecureCodeForensicsIDE(tk.Tk):
                 widget.configure(state=tk.DISABLED)
             except Exception:
                 pass
+
+if __name__ == "__main__":
+    app = SecureCodeForensicsIDE()
+    app.mainloop()
